@@ -8,13 +8,63 @@ import javax.swing.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.lang.String;
-
+import java.util.Scanner;
 
 public class Main {
-    public static boolean terminated;
     public static  String projectDirectory = System.getProperty("user.dir");
+    public static String resetCode = "\033[0m";
     public static void main(String[] args) {
-        System.out.println(convertToKotlin("var x: Int = 5"));
+        File testCasesDirectory = new File(projectDirectory+"/testcases/");
+        File[] foldersArray = testCasesDirectory.listFiles();
+        for(File folderElement : foldersArray) {
+            File[] folderFilesArray = folderElement.listFiles();
+            System.out.println("\u001B[36m" +folderElement.getName() +" :-");
+            System.out.print(resetCode);
+            for (File files : folderFilesArray)
+            {
+                String fileName = files.getName();
+                if (fileName.contains(".swift"))
+                {
+                    System.out.print("\t \u001B[35m"+fileName);
+                    System.out.print(resetCode);
+
+
+                    String swiftCode = IosFileRead(projectDirectory+"/testcases/"+folderElement.getName()+"/"+fileName);
+                    String covertedKotlinCode = convertToKotlin(swiftCode);
+                    String expectedKotlinCode = IosFileRead(projectDirectory+"/testcases/"+folderElement.getName()+"/"+ fileName.substring(0, fileName.length() - 5)+ "kt");
+
+
+                    if (covertedKotlinCode.contains(expectedKotlinCode)) {
+                        System.out.println("\u001B[32m Success");
+                        System.out.print(resetCode);
+                    } else {
+                        System.out.println("\u001B[31m Fail");
+                        System.out.print(resetCode);
+                    }
+
+                    System.out.println("\t\t" + covertedKotlinCode);
+                    System.out.println("\t\t" + expectedKotlinCode);
+
+                }
+            }
+        }
+
+        //System.out.println(convertToKotlin("var x: Int = 5"));
+    }
+
+    public static String IosFileRead(String filepath){
+        String swiftCode = "";
+        try {
+            File Read = new File(filepath);
+            Scanner scan = new Scanner(Read);
+            while(scan.hasNext())
+            {
+                swiftCode = swiftCode.concat(scan.nextLine() + "\n");
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return swiftCode;
     }
     private static String convertToKotlin(String swiftCode) {
         SwiftToKotlinVisitor swiftToKotlinVisitor = new SwiftToKotlinVisitor();
