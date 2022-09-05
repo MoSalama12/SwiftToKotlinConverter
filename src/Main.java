@@ -34,7 +34,7 @@ public class Main {
                     String expectedKotlinCode = IosFileRead(projectDirectory+"/testcases/"+folderElement.getName()+"/"+ fileName.substring(0, fileName.length() - 5)+ "kt");
 
 
-                    if (covertedKotlinCode.contains(expectedKotlinCode)) {
+                    if (isEqual(covertedKotlinCode,expectedKotlinCode.substring(0,expectedKotlinCode.length()-1))) {
                         System.out.println("\u001B[32m Success");
                         System.out.print(resetCode);
                     } else {
@@ -42,14 +42,28 @@ public class Main {
                         System.out.print(resetCode);
                     }
 
-                    System.out.println("\t\t" + covertedKotlinCode);
-                    System.out.println("\t\t" + expectedKotlinCode);
+                    //System.out.println("\t\t" + covertedKotlinCode);
+                    //System.out.println("\t\t" + expectedKotlinCode);
 
                 }
             }
         }
 
         //System.out.println(convertToKotlin("var x: Int = 5"));
+    }
+
+    public static boolean isEqual(String text1 , String text2)
+    {
+        if (text1.length() != text2.length())
+            return false;
+
+
+        for (int i = 0 ; i < text1.length() ;i++)
+        {
+            if (text1.charAt(i) != text2.charAt(i))
+                return false;
+        }
+        return true;
     }
 
     public static String IosFileRead(String filepath){
