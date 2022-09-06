@@ -54,9 +54,10 @@ public class Main {
 
     public static boolean isEqual(String text1 , String text2)
     {
+        text1 = text1.replaceAll("\\s+","");
+        text2 = text2.replaceAll("\\s+","");
         if (text1.length() != text2.length())
             return false;
-
 
         for (int i = 0 ; i < text1.length() ;i++)
         {
