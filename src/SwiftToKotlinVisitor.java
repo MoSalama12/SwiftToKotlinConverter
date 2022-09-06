@@ -2,7 +2,6 @@ import generatedantlr.Swift3BaseVisitor;
 import generatedantlr.Swift3Parser;
 
 public class SwiftToKotlinVisitor extends Swift3BaseVisitor<String> {
-
     @Override
     public String visitTop_level(Swift3Parser.Top_levelContext ctx) {
        String kotlinCode = visitStatements(ctx.statements());
@@ -56,7 +55,7 @@ public class SwiftToKotlinVisitor extends Swift3BaseVisitor<String> {
 
     @Override
     public String visitCode_block(Swift3Parser.Code_blockContext ctx) {
-        return "";
+        return visitStatements(ctx.statements());
     }
 
     @Override
@@ -66,7 +65,14 @@ public class SwiftToKotlinVisitor extends Swift3BaseVisitor<String> {
 
     @Override
     public String visitDeclaration(Swift3Parser.DeclarationContext ctx) {
-        String kotlinDeclaration = visitVariable_declaration(ctx.variable_declaration());
+        String kotlinDeclaration = "";
+        if (ctx.variable_declaration() != null)
+        {
+            kotlinDeclaration = visitVariable_declaration(ctx.variable_declaration());
+        }
+        else if (ctx.function_declaration() != null) {
+            kotlinDeclaration = visitFunction_declaration(ctx.function_declaration());
+        }
         return kotlinDeclaration;
     }
 
@@ -95,17 +101,24 @@ public class SwiftToKotlinVisitor extends Swift3BaseVisitor<String> {
 
     @Override
     public String visitParameter_list(Swift3Parser.Parameter_listContext ctx) {
-        return "";
+        return ctx.getText();
     }
 
     @Override
     public String visitFunction_declaration(Swift3Parser.Function_declarationContext ctx) {
-        return "";
+        String kotlinFunctionDeclaration = "fun ";
+        kotlinFunctionDeclaration += ctx.function_name().declaration_identifier().getText();
+        kotlinFunctionDeclaration += visitFunction_signature(ctx.function_signature());
+        kotlinFunctionDeclaration += " {\n\t" + visitCode_block(ctx.function_body().code_block()) + "\n}";
+
+        return kotlinFunctionDeclaration;
     }
 
     @Override
     public String visitFunction_signature(Swift3Parser.Function_signatureContext ctx) {
-        return "";
+        String kotlinFunctionSignature = "(" + visitParameter_list(ctx.parameter_clause().parameter_list()) + ") : ";
+        kotlinFunctionSignature += ctx.function_result().getChild(1).getText();
+        return kotlinFunctionSignature;
     }
 
     @Override
